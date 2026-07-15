@@ -1,0 +1,187 @@
+/* =============================================================================
+ * System Console 의 "업무영역 코드 관리" UI — MM 테마 자동 추종
+ * ============================================================================= */
+
+.asr-sc-root {
+  --asr-bg:           var(--center-channel-bg, #ffffff);
+  --asr-fg:           var(--center-channel-color, #1f2430);
+  --asr-fg-rgb:       var(--center-channel-color-rgb, 31, 36, 48);
+
+  --asr-muted:        rgba(var(--asr-fg-rgb), 0.64);
+  --asr-line:         rgba(var(--asr-fg-rgb), 0.16);
+  --asr-line-strong:  rgba(var(--asr-fg-rgb), 0.32);
+  --asr-panel:        rgba(var(--asr-fg-rgb), 0.04);
+  --asr-input-bg:     rgba(var(--asr-fg-rgb), 0.04);
+  --asr-hover-bg:     rgba(var(--asr-fg-rgb), 0.08);
+  --asr-row-stripe:   rgba(var(--asr-fg-rgb), 0.02);
+
+  --asr-blue:         var(--button-bg, #1c58d9);
+  --asr-blue-rgb:     var(--button-bg-rgb, 28, 88, 217);
+  --asr-blue-fg:      var(--button-color, #ffffff);
+  --asr-blue-focus-ring: rgba(var(--asr-blue-rgb), 0.32);
+
+  --asr-danger:       var(--dnd-indicator, #d24c4c);
+  --asr-danger-rgb:   220, 76, 76;
+  --asr-danger-soft:  rgba(var(--asr-danger-rgb), 0.1);
+
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  color: var(--asr-fg);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 900px;
+}
+
+/* 헤더 / 공통 */
+.asr-sc-root .asr-admin-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--asr-line);
+}
+.asr-sc-root .asr-status { padding: 12px 0; color: var(--asr-muted); }
+.asr-sc-root .asr-error {
+  background: var(--asr-danger-soft);
+  color: var(--asr-danger);
+  border: 1px solid rgba(var(--asr-danger-rgb), 0.32);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.asr-sc-root .asr-empty {
+  padding: 14px;
+  background: var(--asr-panel);
+  color: var(--asr-muted);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* 폼 */
+.asr-sc-root .asr-form {
+  background: var(--asr-panel);
+  border: 1px solid var(--asr-line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.asr-sc-root .asr-form h5 { margin: 0; font-size: 14px; font-weight: 600; color: var(--asr-fg); }
+.asr-sc-root .asr-form-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 150px 100px;
+  gap: 12px; align-items: end;
+}
+.asr-sc-root .asr-field { display: flex; flex-direction: column; gap: 4px; }
+.asr-sc-root .asr-field > span { font-size: 12px; color: var(--asr-muted); font-weight: 500; }
+.asr-sc-root .asr-field-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; padding-bottom: 6px;
+}
+
+.asr-sc-root .asr-text {
+  border: 1px solid var(--asr-line);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  background: var(--asr-input-bg);
+  color: var(--asr-fg);
+  font-family: inherit;
+}
+.asr-sc-root .asr-text::placeholder { color: var(--asr-muted); }
+.asr-sc-root .asr-text:focus {
+  outline: 2px solid var(--asr-blue);
+  outline-offset: -1px;
+  border-color: var(--asr-blue);
+  background: var(--asr-bg);
+}
+.asr-sc-root .asr-text:disabled { background: var(--asr-panel); color: var(--asr-muted); }
+.asr-sc-root .asr-form-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* 버튼 */
+.asr-sc-root .asr-btn {
+  appearance: none; border: 0;
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: filter 0.1s ease, background 0.1s ease;
+}
+.asr-sc-root .asr-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.asr-sc-root .asr-btn-primary { background: var(--asr-blue); color: var(--asr-blue-fg); }
+.asr-sc-root .asr-btn-primary:not(:disabled):hover { filter: brightness(0.92); }
+.asr-sc-root .asr-btn-secondary {
+  background: transparent;
+  color: var(--asr-fg);
+  border: 1px solid var(--asr-line-strong);
+}
+.asr-sc-root .asr-btn-secondary:not(:disabled):hover { background: var(--asr-hover-bg); }
+.asr-sc-root .asr-btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* 목록 */
+.asr-sc-root .asr-list { display: flex; flex-direction: column; gap: 8px; }
+.asr-sc-root .asr-list-header { display: flex; align-items: center; justify-content: space-between; }
+
+.asr-sc-root .asr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.asr-sc-root .asr-table th,
+.asr-sc-root .asr-table td {
+  text-align: left; padding: 8px 10px;
+  border-bottom: 1px solid var(--asr-line);
+}
+.asr-sc-root .asr-table th {
+  background: var(--asr-panel);
+  color: var(--asr-muted);
+  font-weight: 600; font-size: 12px;
+}
+.asr-sc-root .asr-table tbody tr:hover { background: var(--asr-hover-bg); }
+.asr-sc-root .asr-table tr.asr-row-inactive { opacity: 0.55; }
+.asr-sc-root .asr-actions { white-space: nowrap; text-align: right; }
+
+.asr-sc-root .asr-link {
+  appearance: none; background: none; border: 0;
+  padding: 0; color: var(--asr-blue);
+  cursor: pointer; font-size: 13px;
+  font-family: inherit;
+}
+.asr-sc-root .asr-link:hover { text-decoration: underline; }
+.asr-sc-root .asr-link:disabled { opacity: 0.55; cursor: not-allowed; text-decoration: none; }
+.asr-sc-root .asr-link-danger { color: var(--asr-danger); }
+.asr-sc-root .asr-sep { color: var(--asr-muted); margin: 0 4px; }
+
+/* =============================================================================
+ * Collapse / Expand 헤더 (기본 접힘)
+ * ========================================================================== */
+.asr-sc-root .asr-collapse-btn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--asr-fg);
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+}
+.asr-sc-root .asr-collapse-btn:hover { color: var(--asr-blue); }
+.asr-sc-root .asr-chevron {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--asr-muted);
+  transition: transform 0.15s ease;
+}
+.asr-sc-root .asr-chevron.open { transform: rotate(90deg); }
+.asr-sc-root .asr-summary {
+  font-size: 12px;
+  color: var(--asr-muted);
+  font-weight: 400;
+}
+.asr-sc-root .asr-collapsed-hint {
+  padding: 10px 14px;
+  background: var(--asr-panel);
+  color: var(--asr-muted);
+  border-radius: 6px;
+  font-size: 12px;
+}

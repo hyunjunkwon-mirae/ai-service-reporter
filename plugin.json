@@ -1,0 +1,145 @@
+{
+  "id": "ai_service_reporter",
+  "name": "AI Service Reporter",
+  "version": "0.1.0",
+  "description": "LLM 분석결과를 구독자에게 매일 10:00 발송하는 사내 리포터 플러그인",
+  "homepage_url": "https://gitlab.miraeasset.com/mattermost-plugins/ai-service-reporter-plugin",
+  "support_url": "https://gitlab.miraeasset.com/mattermost-plugins/ai-service-reporter-plugin/issues",
+  "icon_path": "assets/ai_service_reporter.png",
+  "min_server_version": "6.2.1",
+  "server": {
+    "executables": {
+      "linux-amd64": "server/dist/plugin-linux-amd64"
+    }
+  },
+  "webapp": {
+    "bundle_path": "webapp/dist/main.js"
+  },
+  "settings_schema": {
+    "header": "AI Service Reporter 플러그인 설정",
+    "footer": "환경 / Webhook Secret / 발송시간(KST) / 표출 대상 / 메시지 헤더 / 표 라벨·Top N / 폴백 메시지 / 업무영역 코드를 설정하세요.",
+    "settings": [
+      {
+        "key": "Environment",
+        "display_name": "실행 환경",
+        "type": "radio",
+        "default": "production",
+        "options": [
+          {
+            "display_name": "개발 환경",
+            "value": "development"
+          },
+          {
+            "display_name": "운영 환경",
+            "value": "production"
+          }
+        ],
+        "help_text": "DB / LLM 연동 환경을 선택하세요."
+      },
+      {
+        "key": "AutoMigrateDB",
+        "display_name": "DB 마이그레이션 자동 실행",
+        "type": "bool",
+        "default": false,
+        "help_text": "ON 시 활성화 시점에 ai_service_reporter_* 테이블을 자동 생성합니다. OFF 시 DBA가 수동으로 DDL을 실행해야 합니다. (기본 OFF)"
+      },
+      {
+        "key": "LLMWebhookSecret",
+        "display_name": "LLM Webhook Secret",
+        "type": "text",
+        "default": "",
+        "help_text": "LLM 서버가 /webhook/llm-report 호출 시 X-AI-Service-Reporter-Secret 헤더로 전달하는 비밀키.",
+        "secret": true
+      },
+      {
+        "key": "DeliveryTime",
+        "display_name": "발송 시간 (KST)",
+        "type": "text",
+        "default": "10:00",
+        "help_text": "매일 발송할 시각. HH:MM 형식 (24시간제, 한국시간 기준)."
+      },
+      {
+        "key": "AdminChannelId",
+        "display_name": "관리자 알림 채널 ID",
+        "type": "text",
+        "default": "",
+        "help_text": "재시도 3회 후에도 실패한 발송을 알릴 채널 ID. 비워두면 로그만 남김."
+      },
+      {
+        "key": "TestMode5MinInterval",
+        "display_name": "테스트 모드 (5분 간격 발송)",
+        "type": "bool",
+        "default": false,
+        "help_text": "⚠️ ON 시 5분마다 발송 스케줄러가 작동합니다. 스케줄러 동작 검증용이며, 운영에서는 반드시 OFF."
+      },
+      {
+        "key": "VisibleToUsers",
+        "display_name": "사이드바 표출 대상 사번",
+        "type": "text",
+        "default": "*",
+        "help_text": "콤마로 구분된 사번(Mattermost username) 목록을 입력하세요. 예: 20240001,20240002. * 또는 빈 값이면 모든 사용자에게 표출됩니다. ⚠️ admin 권한 사용자라도 이 목록에 없으면 표출되지 않습니다. username 정확 일치만 인정 (email/nickname 등은 비교하지 않음)."
+      },
+      {
+        "key": "TemplateHeader",
+        "display_name": "메시지 헤더 템플릿",
+        "type": "longtext",
+        "default": "안녕하세요! {user.nickname}님!\\n{date} 어플리케이션 모니터링 리포트를 전달드립니다.\\n\\n베타 운영중입니다. 오류나 개선 아이디어가 있으시면 언제든 메타모스트 관리자에게 연락 부탁드립니다!.\\n",
+        "help_text": "발송 메시지 상단 인사말. 사용 가능 변수: {user.nickname}, {date}. 줄바꿈은 \\n 으로 입력하세요."
+      },
+      {
+        "key": "TableHeaderCallCount",
+        "display_name": "표 헤더 — 호출 건수 증가(절댓값) TOP",
+        "type": "text",
+        "default": "TR 호출 건수 증가(절댓값) TOP 5",
+        "help_text": "TR Statistics Summary 의 첫 번째 표 헤더 라벨. (컬럼: 서비스ID / 서비스명 / 주간 평균 호출수 / 2 영업일 전 호출수)"
+      },
+      {
+        "key": "TableHeaderCallCountPct",
+        "display_name": "표 헤더 — 호출 건수 증가율(상댓값) TOP",
+        "type": "text",
+        "default": "TR 호출 건수 증가율(상댓값) TOP 5",
+        "help_text": "TR Statistics Summary 의 두 번째 표 헤더 라벨. (컬럼: 서비스ID / 서비스명 / 호출 건수 증가율)"
+      },
+      {
+        "key": "TableHeaderLatency",
+        "display_name": "표 헤더 — 실행 시간 증가 TOP",
+        "type": "text",
+        "default": "TR 실행 시간 증가 TOP 5",
+        "help_text": "TR Statistics Summary 의 세 번째 표 헤더 라벨. (컬럼: 서비스ID / 서비스명 / Latency 변화)"
+      },
+      {
+        "key": "TableNoDataMessage",
+        "display_name": "표 안 무데이터 메시지",
+        "type": "text",
+        "default": "오늘은 증가 건수가 없습니다.",
+        "help_text": "선택한 업무영역에 해당 랭크에 해당하는 anomaly 가 없을 때 표 자리에 출력될 문구."
+      },
+      {
+        "key": "TableTopN",
+        "display_name": "표 행 수 (Top N)",
+        "type": "text",
+        "default": "5",
+        "help_text": "각 표에 표시할 최대 행 수. 권장 5. 1~20 사이의 양의 정수."
+      },
+      {
+        "key": "TemplateNoData",
+        "display_name": "전체 폴백 메시지 (Summary·영역 리포트 모두 없을 때)",
+        "type": "longtext",
+        "default": "안녕하세요! {user.nickname}님!\\n{date}은 전달드릴 분석 결과가 없습니다. 👍\\n\\n_AI Service Reporter — 매일 {delivery_time} KST 자동 발송_",
+        "help_text": "그날 매칭되는 리포트와 Summary 가 모두 없을 때 발송. 사용 가능 변수: {user.nickname}, {date}, {delivery_time}. 줄바꿈은 \\n 으로."
+      },
+      {
+        "key": "ResourceGroupAdmin",
+        "display_name": "업무영역 코드 관리",
+        "type": "custom",
+        "help_text": "ai_service_reporter_resourcegroups 테이블을 직접 CRUD 합니다. 변경 즉시 RHS 사용자 화면 / AIOps API 응답 / Webhook 검증에 모두 반영됩니다."
+      },
+      {
+        "key": "TestDataAdmin",
+        "display_name": "🚨 테스트 데이터 도구 (운영 안정화 후 제거 예정)",
+        "type": "custom",
+        "help_text": "테스트 데이터 추가(리소스그룹 마스터 idempotent 시드) / 5개 테이블 전체 DELETE. 운영 전환 후 plugin.json 의 이 항목과 testdata_routes.go, TestDataAdminSetting.tsx 를 제거하세요."
+      }
+    ]
+  }
+}

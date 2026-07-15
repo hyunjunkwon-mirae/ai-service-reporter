@@ -1,0 +1,16 @@
+# Build artifacts
+dist/
+server/dist/
+webapp/dist/
+webapp/node_modules/
+out/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Git
+.git/
+.gitignore

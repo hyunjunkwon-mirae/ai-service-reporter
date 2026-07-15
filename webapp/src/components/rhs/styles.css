@@ -1,0 +1,206 @@
+/* =============================================================================
+ * AI Service Reporter RHS Panel — Mattermost 테마 자동 추종
+ *
+ * 색상 전략:
+ *   · 하드코딩 색 (#fff, #1c58d9) 대신 MM CSS 변수 사용
+ *   · 다크모드/화이트모드 자동 전환 — MM 이 변수값을 모드별로 다르게 세팅하므로
+ *   · 알파값 (0.04 ~ 0.6) 으로 hover/border/배경을 자연스럽게
+ *
+ * 사용하는 MM 변수:
+ *   --center-channel-bg / -color / -color-rgb
+ *   --button-bg / -bg-rgb / -color
+ *   --link-color, --dnd-indicator
+ * ============================================================================= */
+
+.asr-rhs {
+  /* ---- 디자인 토큰 (Mattermost 변수 매핑) ---- */
+  --asr-bg:           var(--center-channel-bg, #ffffff);
+  --asr-fg:           var(--center-channel-color, #1f2430);
+  --asr-fg-rgb:       var(--center-channel-color-rgb, 31, 36, 48);
+
+  --asr-muted:        rgba(var(--asr-fg-rgb), 0.64);
+  --asr-line:         rgba(var(--asr-fg-rgb), 0.16);
+  --asr-line-strong:  rgba(var(--asr-fg-rgb), 0.32);
+  --asr-panel:        rgba(var(--asr-fg-rgb), 0.04);
+  --asr-input-bg:     rgba(var(--asr-fg-rgb), 0.04);
+  --asr-hover-bg:     rgba(var(--asr-fg-rgb), 0.08);
+
+  --asr-blue:         var(--button-bg, #1c58d9);
+  --asr-blue-rgb:     var(--button-bg-rgb, 28, 88, 217);
+  --asr-blue-fg:      var(--button-color, #ffffff);
+  --asr-blue-soft:    rgba(var(--asr-blue-rgb), 0.12);
+  --asr-blue-soft-hover: rgba(var(--asr-blue-rgb), 0.22);
+  --asr-blue-focus-ring: rgba(var(--asr-blue-rgb), 0.32);
+
+  --asr-danger:       var(--dnd-indicator, #d24c4c);
+  --asr-danger-rgb:   220, 76, 76;
+  --asr-danger-soft:  rgba(var(--asr-danger-rgb), 0.1);
+
+  padding: 16px 16px 24px;
+  font-family: "Open Sans", "Apple SD Gothic Neo", "맑은 고딕", sans-serif;
+  font-size: 14px;
+  color: var(--asr-fg);
+  background: var(--asr-bg);
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 공통 */
+.asr-status     { padding: 24px; text-align: center; color: var(--asr-muted); }
+.asr-empty      { grid-column: 1 / -1; text-align: center; color: var(--asr-muted); padding: 12px; font-size: 12px; }
+.asr-error      {
+  background: var(--asr-danger-soft);
+  border: 1px solid rgba(var(--asr-danger-rgb), 0.32);
+  color: var(--asr-danger);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* 헤더 / 섹션 */
+.asr-header h3      { margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: var(--asr-fg); }
+.asr-header .asr-sub{ margin: 0 0 16px 0; font-size: 12px; color: var(--asr-muted); }
+.asr-section        { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--asr-line); }
+.asr-section:last-of-type { border-bottom: none; }
+.asr-disabled       { opacity: 0.55; pointer-events: none; }
+.asr-disabled .asr-toggle,
+.asr-disabled .asr-btn { pointer-events: auto; }
+
+.asr-row    { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.asr-label  { display: flex; flex-direction: column; flex: 1; }
+.asr-label > span:first-child { font-weight: 600; font-size: 13px; }
+.asr-hint   { font-size: 11px; color: var(--asr-muted); margin-top: 2px; }
+
+/* 토글 */
+.asr-toggle {
+  width: 44px; height: 24px; border-radius: 12px; border: none;
+  background: var(--asr-line-strong);
+  position: relative; cursor: pointer; transition: background 0.15s ease;
+  padding: 0; flex-shrink: 0;
+}
+.asr-toggle.on { background: var(--asr-blue); }
+.asr-toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; transition: transform 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.asr-toggle.on .asr-toggle-thumb { transform: translateX(20px); }
+.asr-toggle:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* 입력 박스 */
+.asr-search,
+.asr-text {
+  width: 100%; box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--asr-line);
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background: var(--asr-input-bg);
+  color: var(--asr-fg);
+  font-family: inherit;
+}
+.asr-search::placeholder,
+.asr-text::placeholder { color: var(--asr-muted); }
+.asr-search:focus,
+.asr-text:focus {
+  border-color: var(--asr-blue);
+  box-shadow: 0 0 0 2px var(--asr-blue-focus-ring);
+  background: var(--asr-bg);
+}
+.asr-text[readonly] {
+  background: var(--asr-panel);
+  color: var(--asr-muted);
+  cursor: default;
+}
+
+/* 링크 / 구분자 */
+.asr-bulk { font-size: 12px; margin: 8px 0; }
+.asr-link {
+  background: none; border: none; color: var(--asr-blue);
+  cursor: pointer; padding: 0; font-size: 12px; font-family: inherit;
+}
+.asr-link:hover { text-decoration: underline; }
+.asr-link:disabled { color: var(--asr-muted); cursor: not-allowed; text-decoration: none; }
+.asr-sep { color: var(--asr-muted); margin: 0 6px; }
+
+/* 칩 그리드 */
+.asr-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px; margin-top: 8px;
+  max-height: 280px; overflow-y: auto;
+  padding: 4px 2px;
+}
+.asr-chip {
+  position: relative;
+  background: var(--asr-blue-soft);
+  color: var(--asr-fg);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+  font-family: inherit;
+}
+.asr-chip:hover:not(:disabled) { background: var(--asr-blue-soft-hover); }
+.asr-chip.on {
+  background: var(--asr-blue);
+  color: var(--asr-blue-fg);
+  border-color: var(--asr-blue);
+}
+.asr-chip.on:hover:not(:disabled) { background: var(--asr-blue); filter: brightness(0.95); }
+.asr-chip:disabled { cursor: not-allowed; opacity: 0.5; }
+.asr-chip-code  { display: block; }
+.asr-chip-check { position: absolute; top: 2px; right: 4px; font-size: 10px; }
+
+/* 푸터 */
+.asr-footer {
+  margin-top: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--asr-line);
+  position: sticky; bottom: 0;
+  background: var(--asr-bg);
+}
+.asr-footer-right { display: flex; gap: 8px; }
+
+/* 버튼 */
+.asr-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.1s ease, border-color 0.1s ease, filter 0.1s ease;
+  font-family: inherit;
+}
+.asr-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.asr-btn-primary {
+  background: var(--asr-blue);
+  color: var(--asr-blue-fg);
+}
+.asr-btn-primary:not(:disabled):hover { filter: brightness(0.92); }
+.asr-btn-secondary {
+  background: transparent;
+  border-color: var(--asr-line-strong);
+  color: var(--asr-fg);
+}
+.asr-btn-secondary:not(:disabled):hover { background: var(--asr-hover-bg); }
+.asr-btn-danger {
+  background: transparent;
+  border-color: var(--asr-danger);
+  color: var(--asr-danger);
+}
+.asr-btn-danger:not(:disabled):hover { background: var(--asr-danger-soft); }
+
+.asr-subscription { display: flex; flex-direction: column; }
